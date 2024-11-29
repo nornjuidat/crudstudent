@@ -1,4 +1,4 @@
-//npm i express body-parser
+//npm i express body-parser mysql2
 const express = require('express');
 const port = 6183;
 const app = express();
@@ -8,27 +8,13 @@ const bodyParser = require('body-parser');
 const path = require("path");
 app.use(bodyParser.urlencoded({extended: false}));
 
+let db_M = require('./database');
+global.db_pool = db_M.pool;
+
+
 //--- courses ---
-let courses=[];
-app.post("/courses", (req, res) => { //Create - הוספה
-    let course_name   = req.body.course_name;
-    courses.push({name:course_name});
-    res.status(200).json("ok");
-});
-app.get('/courses', (req, res) => { //Read - קבלת רשימה
-    res.status(200).json(courses);
-});
-app.put('/courses', (req, res) => { //Update - עריכה
-    let idx             = req.body.idx;
-    let course_name     = req.body.course_name;
-    courses[idx]={name:course_name};
-    res.status(200).json("ok");
-});
-app.delete('/courses', (req, res) => { // Delete - מחיקה
-    let idx             = req.body.idx;
-    courses.splice(idx, 1);
-    res.status(200).json("ok");
-});
+const course_R = require('./Routers/course_R');
+app.use('/C/',course_R);
 
 
 app.listen(port, () => {            //server starts listening for any attempts from a client to connect at port: {port}
