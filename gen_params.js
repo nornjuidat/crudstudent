@@ -1,4 +1,4 @@
 exports.HOST        ="localhost";
 exports.USER        ="root";
 exports.PASSWORD    ="";
-exports.DATABASE    ="kinneret_grades";
+exports.DATABASE    ="kinnert-gardes";

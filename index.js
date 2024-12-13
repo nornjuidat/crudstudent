@@ -1,6 +1,6 @@
 //npm i express body-parser mysql2
 const express = require('express');
-const port = 6183;
+const port = 4000;
 const app = express();
 app.use(express.json());
 

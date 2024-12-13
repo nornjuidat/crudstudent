@@ -1,13 +1,13 @@
 const express = require('express');
+const {query} = require("express");
 const router = express.Router();
 module.exports = router;
-
 let courses=[];
 
 router.post("/courses", (req, res) => { //Create - הוספה
-    let course_name   = req.body.course_name;
-
+        let course_name   = req.body.course_name;
     const Query = `INSERT INTO courses (name) VALUES('${course_name}')`;
+    console.log(Query)
     db_pool.query(Query,function (err,rows,fields,){
         if (err){
             res.status(500).json({message:err});
