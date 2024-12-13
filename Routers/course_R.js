@@ -1,13 +1,14 @@
 const express = require('express');
-const {query} = require("express");
 const router = express.Router();
 module.exports = router;
+
 let courses=[];
 
 router.post("/courses", (req, res) => { //Create - הוספה
-        let course_name   = req.body.course_name;
+    let course_name   = req.body.course_name;
+
     const Query = `INSERT INTO courses (name) VALUES('${course_name}')`;
-    console.log(Query)
+    // console.log(Query);
     db_pool.query(Query,function (err,rows,fields,){
         if (err){
             res.status(500).json({message:err});
@@ -17,13 +18,33 @@ router.post("/courses", (req, res) => { //Create - הוספה
     })
 });
 router.get('/courses', (req, res) => { //Read - קבלת רשימה
-    res.status(200).json(courses);
+    const Query = `SELECT * FROM courses `;
+    // console.log(Query);
+    db_pool.query(Query,function (err,rows,fields,){
+        if (err){
+            res.status(500).json({message:err});
+        }else{
+            res.status(200).json(rows);
+        }
+    })
 });
-router.put('/courses', (req, res) => { //Update - עריכה
+router.put('/courses', async (req, res) => { //Update - עריכה
     let idx             = req.body.idx;
     let course_name     = req.body.course_name;
-    courses[idx]={name:course_name};
-    res.status(200).json("ok");
+
+    let Query = `UPDATE courses SET `;
+    Query += ` name = '${course_name}' `;
+    Query += ` WHERE id = ${idx} `;
+
+    const promisePool = db_pool.promise();
+    let rows=[];
+    try {
+        [rows] = await promisePool.query(Query);
+        res.status(200).json({msg:"ok",data:rows});
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({message: err});
+    }
 });
 router.delete('/courses', (req, res) => { // Delete - מחיקה
     let idx             = req.body.idx;
