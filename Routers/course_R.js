@@ -2,31 +2,22 @@ const express = require('express');
 const router = express.Router();
 module.exports = router;
 
-let courses=[];
+const courseMid=require("../middleware/course_Mid");
 
-router.post("/courses", (req, res) => { //Create - הוספה
-    let course_name   = req.body.course_name;
-
-    const Query = `INSERT INTO courses (name) VALUES('${course_name}')`;
-    // console.log(Query);
-    db_pool.query(Query,function (err,rows,fields,){
-        if (err){
-            res.status(500).json({message:err});
-        }else{
-            res.status(200).json({message:"OK",Last_Id:rows.insertId});
-        }
-    })
+router.post("/courses",[courseMid.AddCourse], (req, res) => { //Create - הוספה
+    if(req.success){
+        res.status(200).json({msg:"ok",Last_Id:req.insertId});
+    } else {
+        return res.status(500).json({message: err});
+    }
 });
-router.get('/courses', (req, res) => { //Read - קבלת רשימה
-    const Query = `SELECT * FROM courses `;
-    // console.log(Query);
-    db_pool.query(Query,function (err,rows,fields,){
-        if (err){
-            res.status(500).json({message:err});
-        }else{
-            res.status(200).json(rows);
-        }
-    })
+router.get('/courses',[courseMid.ReadCourses], (req, res) => { //Read - קבלת רשימה
+    if(req.success){
+        res.status(200).json({msg:"ok",data:req.course_data});
+    } else {
+        return res.status(500).json({message: err});
+    }
+
 });
 router.put('/courses', async (req, res) => { //Update - עריכה
     let idx             = req.body.idx;
@@ -46,8 +37,18 @@ router.put('/courses', async (req, res) => { //Update - עריכה
         return res.status(500).json({message: err});
     }
 });
-router.delete('/courses', (req, res) => { // Delete - מחיקה
+router.delete('/courses',async (req, res) => { // Delete - מחיקה
     let idx             = req.body.idx;
-    courses.splice(idx, 1);
-    res.status(200).json("ok");
+    let Query = `DELETE FROM courses  `;
+    Query += ` WHERE id = ${idx} `;
+
+    const promisePool = db_pool.promise();
+    let rows=[];
+    try {
+        [rows] = await promisePool.query(Query);
+        res.status(200).json({msg:"ok",data:rows});
+    } catch (err) {
+        console.log(err);
+        return res.status(500).json({message: err});
+    }
 });
