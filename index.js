@@ -1,6 +1,6 @@
-//npm i express body-parser mysql2
+//npm i express body-parser mysql2 htmlspecialchars
 const express = require('express');
-const port = 4000;
+const port = 6183;
 const app = express();
 app.use(express.json());
 
@@ -11,10 +11,14 @@ app.use(bodyParser.urlencoded({extended: false}));
 let db_M = require('./database');
 global.db_pool = db_M.pool;
 
+global.htmlspecialchars = require('htmlspecialchars');
 
-//--- courses ---
+//--- routers ---
 const course_R = require('./Routers/course_R');
 app.use('/C/',course_R);
+
+const Students_R = require('./Routers/Students_R');
+app.use('/S/',Students_R);
 
 
 app.listen(port, () => {            //server starts listening for any attempts from a client to connect at port: {port}
